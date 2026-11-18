@@ -78,7 +78,40 @@ The bundle is installed from the app path, not a workspace-relative directory.
 The disposable integration test exercises backup, idempotence, drift correction,
 native file identity and the automatic repair step without touching owner data.
 
-## Recovery
+## Unit-only downstream coverage
+
+The downstream coverage gate consumes Clover from the **Unit** suite, not from
+the native integration suite. Keep bundle, sync and OCC behavior covered in
+`tests/Unit/Service/SovereignBundleTest.php`,
+`tests/Unit/Service/SovereignPortalSyncTest.php` and
+`tests/Unit/Command/SyncSovereignPortalCommandTest.php`.
+Their shared fixture uses disposable bundle files, mocked Nextcloud interfaces,
+and real final bundle/sync objects; it never boots Nextcloud or contacts a service.
+The standalone bootstrap loads missing Files/locking contracts directly from the
+existing OCP development dependency, not the runtime's production vendor tree.
+
+With Xdebug enabled **for CLI coverage only**, focused line and branch evidence
+can be generated without changing the downstream PCOV configuration:
+
+```bash
+XDEBUG_MODE=coverage php -d memory_limit=1G vendor/bin/phpunit \
+  tests/Unit/Service/SovereignPortalSyncTest.php \
+  tests/Unit/Command/SyncSovereignPortalCommandTest.php \
+  tests/Unit/Service/SovereignBundleTest.php --path-coverage \
+  --coverage-clover generated-artifacts/gold-master/unit-clover.xml \
+  --coverage-php generated-artifacts/gold-master/unit-coverage.php
+```
+
+The local Replit configuration supplies `php82Extensions.xdebug`; load its
+`xdebug.so` using `-d zend_extension=/resolved/package/path/xdebug.so` when it is
+not already enabled in the CLI interpreter. It is not enabled in the web workflow
+or included in the installable app. PCOV measures lines, not branches; use the
+Xdebug path-coverage report to verify the requested ≥90% branch target. Do not
+weaken the downstream threshold or count integration-only tests as Unit evidence.
+Keep running the entire Unit suite as well; the focused report measures only the
+three Gold Master classes and is not an application-wide coverage claim.
+
+## Recovery procedure
 
 Stop the deployment job before recovery. Review the private snapshot as a
 Nextcloud administrator, then restore only the intended paths through native

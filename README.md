@@ -8,6 +8,11 @@ automated deployment step. The sync preserves file IDs, detects live drift and
 exits cleanly on a second unchanged run. No production deployment is performed
 by this repository's build-only Jenkins job.
 
+Gold Master Unit tests now exercise synchronization, backups, idempotence,
+forced updates and OCC error handling independently of Nextcloud. See the
+[Unit-only coverage instructions](docs/engineering/sovereign-gold-master.md#unit-only-downstream-coverage)
+for the downstream PCOV gate and local line/branch measurement.
+
 # Sovereign 365 Portal
 
 **The Athena Group workspace on Nextcloud, built on IntraVox.**
